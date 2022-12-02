@@ -1,3 +1,6 @@
+/* eslint-disable jsdoc/require-jsdoc */
+const fs = require('fs');
+const path = require('path');
 const inquirer = require('inquirer');
 const { uniq, flatten } = require('lodash');
 const chalk = require('chalk');
@@ -36,7 +39,9 @@ function parseInputs(input, amplify, defaultValuesFilename, stringMapsFilename, 
       return getAllDefaults(amplify.getProjectDetails(amplify))[input.key];
     },
   };
-
+  if (input.key === 'signinwithapplePrivateKeyUserPool') {
+    question.validate = validateP8Key;
+  }
   if (input.type && ['list', 'multiselect'].includes(input.type)) {
     if (context.updatingAuth && input.iterator) {
       question = iteratorQuestion(input, question, context);
@@ -47,43 +52,33 @@ function parseInputs(input, amplify, defaultValuesFilename, stringMapsFilename, 
     } else if (input.requiredOptions) {
       question = getRequiredOptions(input, question, getAllMaps, context, currentAnswers);
     } else if (!input.requiredOptions || (question.when && !question.when())) {
-      question = Object.assign(
-        {
-          choices: input.map ? getAllMaps(context.updatingAuth)[input.map] : input.options,
-        },
-        question,
-      );
+      question = {
+        choices: input.map ? getAllMaps(context.updatingAuth)[input.map] : input.options,
+        ...question,
+      };
     }
   }
 
   if (input.type && input.type === 'list') {
-    question = Object.assign(
-      {
-        type: 'list',
-      },
-      question,
-    );
+    question = {
+      type: 'list',
+      ...question,
+    };
   } else if (input.type && input.type === 'multiselect') {
-    question = Object.assign(
-      {
-        type: 'checkbox',
-      },
-      question,
-    );
+    question = {
+      type: 'checkbox',
+      ...question,
+    };
   } else if (input.type && input.type === 'confirm') {
-    question = Object.assign(
-      {
-        type: 'confirm',
-      },
-      question,
-    );
+    question = {
+      type: 'confirm',
+      ...question,
+    };
   } else {
-    question = Object.assign(
-      {
-        type: 'input',
-      },
-      question,
-    );
+    question = {
+      type: 'input',
+      ...question,
+    };
   }
 
   return question;
@@ -91,23 +86,19 @@ function parseInputs(input, amplify, defaultValuesFilename, stringMapsFilename, 
 
 function iteratorQuestion(input, question, context) {
   if (context.updatingAuth[input.iterator]) {
-    question = Object.assign(
-      {
-        choices: context.updatingAuth[input.iterator].map(i => ({
-          name: i,
-          value: i,
-        })),
-      },
-      question,
-    );
+    question = {
+      choices: context.updatingAuth[input.iterator].map(i => ({
+        name: i,
+        value: i,
+      })),
+      ...question,
+    };
   } else if (input.iterator) {
     // TODO: make iterator key useful for non-update actions
-    question = Object.assign(
-      {
-        choices: [],
-      },
-      question,
-    );
+    question = {
+      choices: [],
+      ...question,
+    };
   }
   return question;
 }
@@ -117,15 +108,12 @@ function getRequiredOptions(input, question, getAllMaps, context, currentAnswers
   const sourceArray = uniq(flatten(input.requiredOptions.map(i => sourceValues[i] || [])));
   const requiredOptions = getAllMaps()[input.map] ? getAllMaps()[input.map].filter(x => sourceArray.includes(x.value)) : [];
   const trueOptions = getAllMaps()[input.map] ? getAllMaps()[input.map].filter(x => !sourceArray.includes(x.value)) : [];
-  const msg =
-    requiredOptions && requiredOptions.length > 0
-      ? `--- ${input.requiredOptionsMsg} ${requiredOptions.map(t => t.name).join(', ')}   ---`
-      : '';
+  const msg = requiredOptions && requiredOptions.length > 0
+    ? `--- ${input.requiredOptionsMsg} ${requiredOptions.map(t => t.name).join(', ')}   ---`
+    : '';
   question = Object.assign(question, {
     choices: [new inquirer.Separator(msg), ...trueOptions],
-    filter: userInput => {
-      return userInput.concat(...requiredOptions.map(z => z.value));
-    },
+    filter: userInput => userInput.concat(...requiredOptions.map(z => z.value)),
   });
   return question;
 }
@@ -150,7 +138,7 @@ function filterInputs(input, question, getAllMaps, context, currentAnswers) {
         });
       });
     }
-    question = Object.assign({ choices }, question);
+    question = { choices, ...question };
   }
   if (input.filter === 'attributes') {
     let choices = input.map ? getAllMaps(context.updatingAuth)[input.map] : input.options;
@@ -178,7 +166,7 @@ function filterInputs(input, question, getAllMaps, context, currentAnswers) {
         }
       }
     });
-    question = Object.assign({ choices }, question);
+    question = { choices, ...question };
   }
   if (input.filter === 'updateOptions' && context.updatingAuth) {
     const choices = input.map ? getAllMaps(context.updatingAuth)[input.map] : input.options;
@@ -197,7 +185,7 @@ function filterInputs(input, question, getAllMaps, context, currentAnswers) {
         }
       }
     });
-    question = Object.assign({ choices: newChoices }, question);
+    question = { choices: newChoices, ...question };
   }
   return question;
 }
@@ -205,8 +193,7 @@ function filterInputs(input, question, getAllMaps, context, currentAnswers) {
 function triggerDefaults(context, input, availableOptions) {
   const capabilityDefaults = [];
   if (context.updatingAuth.triggers) {
-    const current =
-      typeof context.updatingAuth[input.key] === 'string' ? JSON.parse(context.updatingAuth[input.key]) : context.updatingAuth[input.key];
+    const current = typeof context.updatingAuth[input.key] === 'string' ? JSON.parse(context.updatingAuth[input.key]) : context.updatingAuth[input.key];
     try {
       if (current) {
         availableOptions.forEach(a => {
@@ -233,4 +220,15 @@ function triggerDefaults(context, input, availableOptions) {
   return capabilityDefaults;
 }
 
+const validateP8Key = filePath => {
+  const parsedPath = path.join(process.cwd(), filePath);
+  if (!fs.existsSync(parsedPath)) {
+    return 'Could not find the specified file';
+  }
+  const contents = fs.readFileSync(parsedPath, 'utf-8');
+  if (contents && contents.match(/(-+BEGIN PRIVATE KEY-+)(.+[^-])(-+END PRIVATE KEY-+)/gs)) {
+    return true;
+  }
+  return 'The provided file does not contain a valid private key.';
+};
 module.exports = { parseInputs };
