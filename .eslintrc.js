@@ -9,31 +9,32 @@ const dictionary = require("./.eslint-dictionary.json");
  */
 module.exports = {
   root: true,
-  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   parser: "@typescript-eslint/parser", // Specifies the ESLint parser
   env: {
     es6: true,
     node: true,
-    jest: true
+    jest: true,
   },
   parserOptions: {
     ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
     sourceType: "module", // Allows for the use of imports
+    project: ["tsconfig.base.json", "packages/amplify-cli/tsconfig.json"],
     ecmaFeatures: {
       jsx: true, // Allows for the parsing of JSX
       arrowFunctions: true,
       modules: true,
-      module: true
-    }
+      module: true,
+    },
   },
   plugins: ["@typescript-eslint", "spellcheck", "import", "jsdoc", "prefer-arrow"],
   settings: {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"]
+      "@typescript-eslint/parser": [".ts", ".tsx"],
     },
     "import/resolver": {
-      typescript: {}
-    }
+      typescript: {},
+    },
   },
   rules: {
     "@typescript-eslint/no-var-requires": "off",
@@ -41,39 +42,46 @@ module.exports = {
     "@typescript-eslint/no-misused-promises": "error",
     "no-bitwise": "warn",
     "spellcheck/spell-checker": [
-      "error",
+      "warn",
       {
         lang: "en_US",
         skipWords: dictionary,
         skipIfMatch: [
           "http://[^s]*",
-          "^[-\\w]+/[-\\w\\.]+$" //For MIME Types
+          "^[-\\w]+/[-\\w\\.]+$", //For MIME Types
         ],
-        minLength: 4
-      }
-    ]
-  },
-  parserOptions: {
-    project: ["tsconfig.base.json", "packages/amplify-cli/tsconfig.json"]
+        minLength: 4,
+      },
+    ],
   },
   overrides: [
     {
       // Add files to this list that shouldn't be spellchecked
       files: [".eslintrc.js"],
       rules: {
-        "spellcheck/spell-checker": "off"
-      }
+        "spellcheck/spell-checker": "off",
+      },
     },
     {
       // edit rules here to modify test linting
-      files: ["__tests__/**", "*.test.ts"],
-      plugins: ["jest", "only-warn"],
+      files: ["__tests__/**", "*.test.ts", "**/amplify-e2e-tests/**"],
+      plugins: ["jest"],
       extends: ["plugin:jest/recommended"],
       rules: {
         "@typescript-eslint/unbound-method": "off",
         "jest/unbound-method": "error",
-        "@typescript-eslint/no-explicit-any": "off"
-      }
+        "@typescript-eslint/no-explicit-any": "off",
+        "spellcheck/spell-checker": "off"
+      },
+    },
+    {
+      // disable spell checker in tests
+      files: ["**/__tests__/**", "*.test.ts", "packages/amplify-e2e-*/**", "**/test/**"],
+      plugins: ["jest"],
+      extends: ["plugin:jest/recommended"],
+      rules: {
+        "spellcheck/spell-checker": "off"
+      },
     }
   ],
   // Files / paths / globs that shouldn't be linted at all
@@ -88,6 +96,8 @@ module.exports = {
     "build",
     "__mocks__",
     "coverage",
+    "packages/**/lib",
+    "**/__e2e__/**",
 
     // Forked package
     "amplify-velocity-template",
@@ -154,6 +164,6 @@ module.exports = {
     "/packages/amplify-opensearch-simulator/lib",
 
     // Ignore CHANGELOG.md files
-    "/packages/*/CHANGELOG.md"
-  ]
+    "/packages/*/CHANGELOG.md",
+  ],
 };
