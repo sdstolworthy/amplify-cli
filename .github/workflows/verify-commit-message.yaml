@@ -11,4 +11,4 @@ jobs:
         with:
           fetch-depth: 0
       - name: lint commit
-        run: echo '${{ github.event.pull_request.title }}' >> .commit && npx commitlint --edit ./.commit
+        run: yarn && echo '${{ github.event.pull_request.title }}' >> .commit && npx commitlint --edit ./.commit
