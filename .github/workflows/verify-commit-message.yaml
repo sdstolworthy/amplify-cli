@@ -1,12 +1,18 @@
 name: echo pr title
 on:
-  push:
   pull_request:
     types: [opened, synchronize]
 
 jobs:
   print_title:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Print Title of PR
         run: echo The Title of your PR is ${{ github.event.pull_request.title }}
+      - name: lint commit
+        run: "npx run commitlint << EOF \
+          ${{ github.event.pull_request.title }} \
+          << EOF"
