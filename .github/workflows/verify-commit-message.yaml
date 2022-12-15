@@ -1,4 +1,4 @@
-name: echo pr title
+name: Lint Pull Request Title
 on:
   pull_request:
     types: [opened, synchronize]
@@ -14,5 +14,5 @@ jobs:
         run: echo The Title of your PR is ${{ github.event.pull_request.title }}
       - name: lint commit
         run: "npx commitlint <<EOF
-          ${{ github.event.pull_request.title }}
-          EOF"
+${{ github.event.pull_request.title }}
+EOF"
