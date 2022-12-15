@@ -1,3 +1,4 @@
+name: echo pr title
 on:
   push:
   pull_request:
