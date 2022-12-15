@@ -4,7 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-  print_title_of_pr:
+jobs:
+  print_title:
     runs-on: ubuntu-20.04
     steps:
       - name: Print Title of PR
