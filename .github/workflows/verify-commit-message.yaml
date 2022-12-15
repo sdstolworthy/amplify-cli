@@ -13,5 +13,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: install lint dependencies
+        run: npm install -g @commitlint/config-lerna-scopes @commitlint/config-conventional
       - name: lint commit
         run: echo '${{ github.event.pull_request.title }}' | npx commitlint
