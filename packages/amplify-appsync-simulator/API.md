@@ -130,7 +130,7 @@ export type AmplifyAppSyncSimulatorRequestContext = {
     jwt?: object;
     requestAuthorizationMode: AmplifyAppSyncSimulatorAuthenticationType;
     request: Request_2;
-    appsyncErrors: {};
+    appsyncErrors: unknown;
 };
 
 // @public (undocumented)
@@ -189,7 +189,7 @@ export interface AppSyncSimulatorDataSourceDDBConfig extends AppSyncSimulatorDat
 // @public (undocumented)
 export interface AppSyncSimulatorDataSourceLambdaConfig extends AppSyncSimulatorDataSourceBaseConfig {
     // (undocumented)
-    invoke: Function;
+    invoke: (...args: unknown[]) => unknown;
     // (undocumented)
     type: AppSyncSimulatorDataSourceType.Lambda | `${AppSyncSimulatorDataSourceType.Lambda}`;
 }

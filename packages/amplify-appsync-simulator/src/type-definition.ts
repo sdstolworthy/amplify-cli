@@ -72,7 +72,7 @@ export interface AppSyncSimulatorDataSourceNoneConfig extends AppSyncSimulatorDa
 }
 export interface AppSyncSimulatorDataSourceLambdaConfig extends AppSyncSimulatorDataSourceBaseConfig {
   type: AppSyncSimulatorDataSourceType.Lambda | `${AppSyncSimulatorDataSourceType.Lambda}`;
-  invoke: Function;
+  invoke: (...args: unknown[]) => unknown;
 }
 export type AppSyncSimulatorDataSourceConfig =
   | AppSyncSimulatorDataSourceDDBConfig
@@ -157,5 +157,5 @@ export type AmplifyAppSyncSimulatorRequestContext = {
   jwt?: object;
   requestAuthorizationMode: AmplifyAppSyncSimulatorAuthenticationType;
   request: Request;
-  appsyncErrors: {};
+  appsyncErrors: unknown[];
 };
