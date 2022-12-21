@@ -26,7 +26,9 @@ export const zipPackage = (zipEntries: ZipEntry[], packageFileName: string): Pro
           zip.directory(entry?.packageFolder, false);
         }
       });
-      zip.finalize();
+      zip.finalize().catch(err => {
+        throw err;
+      });
     });
   }
   return undefined;

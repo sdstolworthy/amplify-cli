@@ -73,7 +73,7 @@ export const run = async (context: $TSContext) => {
       if (await prompter.yesOrNo(getMigrateResourceMessageForOverride(AmplifyCategories.STORAGE, selectedResourceName, false), true)) {
         await s3ResourceInputState.migrate(context); //migrate auth and storage config resources
         const stackGenerator = new AmplifyS3ResourceStackTransform(selectedResourceName, context);
-        stackGenerator.transform(CLISubCommandType.MIGRATE);
+        await stackGenerator.transform(CLISubCommandType.MIGRATE);
       } else {
         return;
       }

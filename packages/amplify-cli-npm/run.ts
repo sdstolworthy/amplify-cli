@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 import { run } from '.';
 
-run();
+run().catch(err => {
+  throw err;
+});

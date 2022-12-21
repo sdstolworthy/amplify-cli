@@ -33,7 +33,7 @@ function zipFile(sourceDir, destFilePath, extraFiles) {
       }
     }
 
-    archive.finalize();
+    await archive.finalize();
   });
 }
 

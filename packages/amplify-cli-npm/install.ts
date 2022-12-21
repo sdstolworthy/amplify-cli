@@ -2,4 +2,6 @@
 
 import { install } from '.';
 
-install();
+install().catch(err => {
+  throw err;
+});

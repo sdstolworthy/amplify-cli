@@ -101,17 +101,20 @@ export class WebsocketSubscriptionServer {
     this.connections.delete(connectionContext);
   };
 
-  private onUnsubscribe = (connectionContext: ConnectionContext, messageOrSubscriptionId: GQLMessageSubscriptionStop): void => {
+  private onUnsubscribe = async (
+    connectionContext: ConnectionContext,
+    messageOrSubscriptionId: GQLMessageSubscriptionStop,
+  ): Promise<void> => {
     const { id } = messageOrSubscriptionId;
-    this.stopAsyncIterator(connectionContext, id);
+    await this.stopAsyncIterator(connectionContext, id);
     this.sendMessage(connectionContext, id, MESSAGE_TYPES.GQL_COMPLETE, {});
   };
 
-  private stopAsyncIterator = (connectionContext: ConnectionContext, id: string): void => {
+  private stopAsyncIterator = async (connectionContext: ConnectionContext, id: string): Promise<void> => {
     if (connectionContext.subscriptions && connectionContext.subscriptions.has(id)) {
       const subscription = connectionContext.subscriptions.get(id);
       if (subscription.asyncIterator) {
-        subscription.asyncIterator.return();
+        await subscription.asyncIterator.return();
       }
 
       connectionContext.subscriptions.delete(id);
@@ -260,7 +263,7 @@ export class WebsocketSubscriptionServer {
       };
       connectionContext.subscriptions.set(id, subscription);
       this.sendMessage(connectionContext, id, MESSAGE_TYPES.GQL_START_ACK, {});
-      this.attachAsyncIterator(connectionContext, subscription);
+      await this.attachAsyncIterator(connectionContext, subscription);
     }
   };
 

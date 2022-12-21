@@ -15,10 +15,10 @@ export const run = async (context: Context) => {
     .then(async subCommandModule => {
       await subCommandModule.run(context);
     })
-    .catch(err => {
+    .catch(async err => {
       context.print.error(`Error executing command amplify plugin ${subCommand}`);
       context.print.error(err.message || err.stack || JSONUtilities.stringify(err));
-      context.usageData.emitError(err);
+      await context.usageData.emitError(err);
       exitOnNextTick(1);
     });
 };
