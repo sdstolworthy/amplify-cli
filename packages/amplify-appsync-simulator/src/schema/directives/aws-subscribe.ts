@@ -18,7 +18,9 @@ export const getAwsSubscribeDirectiveTransformer = (
           const newResolver = async (parent, args, context, info) => {
             const result = await resolve(parent, args, context, info);
             subscriptions.forEach(subscriptionName => {
-              simulatorContext.pubsub.publish(subscriptionName, result);
+              simulatorContext.pubsub.publish(subscriptionName, result).catch(err => {
+                throw err;
+              });
             });
             return result;
           };

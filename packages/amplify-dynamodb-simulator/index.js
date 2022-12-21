@@ -205,7 +205,7 @@ async function launch(givenOptions = {}, retry = 0, startTime = Date.now()) {
               // empty
             });
         };
-        proc.on('exit', prematureExit);
+        void proc.on('exit', prematureExit);
       }),
     ]);
 
@@ -227,7 +227,7 @@ async function launch(givenOptions = {}, retry = 0, startTime = Date.now()) {
   } finally {
     waiter && waiter.cancel();
     if (typeof prematureExit === 'function') {
-      proc.removeListener('exit', prematureExit);
+      void proc.removeListener('exit', prematureExit);
     }
   }
 

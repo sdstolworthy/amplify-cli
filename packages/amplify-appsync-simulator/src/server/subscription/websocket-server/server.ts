@@ -92,7 +92,9 @@ export class WebsocketSubscriptionServer {
 
   private onClose = (connectionContext: ConnectionContext): void => {
     connectionContext.subscriptions.forEach(subscriptionId => {
-      this.stopAsyncIterator(connectionContext, subscriptionId.id);
+      this.stopAsyncIterator(connectionContext, subscriptionId.id).catch(err => {
+        throw err;
+      });
     });
     if (connectionContext.pingIntervalHandle) {
       clearInterval(connectionContext.pingIntervalHandle);
@@ -245,7 +247,7 @@ export class WebsocketSubscriptionServer {
     const variables = data.variables;
     const headers = message.payload.extensions.authorization;
     if (connectionContext.subscriptions && connectionContext.subscriptions.has(id)) {
-      this.stopAsyncIterator(connectionContext, id);
+      await this.stopAsyncIterator(connectionContext, id);
     }
     const asyncIterator = await this.options.onSubscribeHandler(query, variables, headers, connectionContext.request);
     if ((asyncIterator as ExecutionResult).errors) {

@@ -53,6 +53,8 @@ function run(command, projectDirectory) {
         rejectFlag = true;
         reject(code);
       }
+    }).catch(err => {
+      throw err
     });
 
     execution.on('error', err => {
@@ -61,6 +63,8 @@ function run(command, projectDirectory) {
         rejectFlag = true;
         reject(err);
       }
+    }).catch((err) => {
+      throw err
     });
   });
 }

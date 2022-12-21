@@ -60,7 +60,7 @@ export const run = async (context: $TSContext) => {
     const resourceInputState = new DynamoDBInputState(context, selectedResourceName);
     if (!resourceInputState.cliInputFileExists()) {
       if (await prompter.yesOrNo(getMigrateResourceMessageForOverride(AmplifyCategories.STORAGE, selectedResourceName, false), true)) {
-        resourceInputState.migrate();
+        await resourceInputState.migrate();
         const stackGenerator = new DDBStackTransform(context, selectedResourceName);
         await stackGenerator.transform();
       } else {

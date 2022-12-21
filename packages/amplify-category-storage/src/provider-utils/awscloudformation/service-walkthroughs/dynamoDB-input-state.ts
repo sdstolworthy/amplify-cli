@@ -49,13 +49,13 @@ export class DynamoDBInputState {
     return fs.existsSync(this._cliInputsFilePath);
   }
 
-  public async isCLIInputsValid(cliInputs?: DynamoDBCLIInputs) {
+  public async isCLIInputsValid(cliInputs?: DynamoDBCLIInputs): Promise<boolean> {
     if (!cliInputs) {
       cliInputs = this.getCliInputPayload();
     }
 
     const schemaValidator = new CLIInputSchemaValidator(this.context, this._service, this._category, 'DynamoDBCLIInputs');
-    await schemaValidator.validateInput(JSON.stringify(cliInputs));
+    return schemaValidator.validateInput(JSON.stringify(cliInputs));
   }
 
   public async saveCliInputPayload(cliInputs: DynamoDBCLIInputs): Promise<void> {

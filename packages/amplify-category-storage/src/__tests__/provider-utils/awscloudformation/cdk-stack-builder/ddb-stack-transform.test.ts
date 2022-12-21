@@ -36,7 +36,7 @@ describe('Test DDB transform generates correct CFN template', () => {
   let mockContext: $TSContext;
 
   beforeEach(() => {
-    mockContext = {
+    mockContext = ({
       amplify: {
         getCategoryPluginInfo: (_context: $TSContext, category: string) => {
           return {
@@ -47,7 +47,7 @@ describe('Test DDB transform generates correct CFN template', () => {
       input: {
         options: {},
       },
-    } as unknown as $TSContext;
+    } as unknown) as $TSContext;
   });
 
   afterEach(() => {

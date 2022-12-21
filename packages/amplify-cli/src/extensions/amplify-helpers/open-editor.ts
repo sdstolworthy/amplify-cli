@@ -71,11 +71,15 @@ export async function openEditor(context: $TSContext, filePath: string, waitToCo
             stdio: 'ignore',
           });
 
-          subProcess.on('error', err => {
-            context.print.error(
-              `Selected editor ${editorSelected} was not found in your machine. Manually edit the file created at ${filePath}`,
-            );
-          });
+          subProcess
+            .on('error', err => {
+              context.print.error(
+                `Selected editor ${editorSelected} was not found in your machine. Manually edit the file created at ${filePath}`,
+              );
+            })
+            .catch(err => {
+              throw err;
+            });
 
           subProcess.unref();
           context.print.info(`Edit the file in your editor: ${filePath}`);

@@ -451,7 +451,9 @@ export class DeploymentManager {
     monitor.start();
     return () => {
       if (monitor) {
-        monitor.stop();
+        monitor.stop().catch(err => {
+          throw err;
+        });
       }
     };
   };
