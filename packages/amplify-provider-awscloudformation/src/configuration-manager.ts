@@ -1,4 +1,13 @@
-import { exitOnNextTick, JSONUtilities, pathManager, stateManager, $TSAny, $TSContext, AmplifyError } from 'amplify-cli-core';
+import {
+  exitOnNextTick,
+  AwsConfig as CoreAwsConfig,
+  JSONUtilities,
+  pathManager,
+  stateManager,
+  $TSAny,
+  $TSContext,
+  AmplifyError,
+} from 'amplify-cli-core';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import { prompt } from 'inquirer';
@@ -185,7 +194,7 @@ function normalizeInputParams(context: $TSContext) {
         });
       }
     }
-    context.exeInfo.inputParams[constants.ProviderName] = normalizedInputParams;
+    context.exeInfo.inputParams[constants.ProviderName as 'awscloudformation'] = normalizedInputParams;
   }
 }
 
@@ -479,7 +488,7 @@ async function validateConfig(context: $TSContext) {
 
 function persistLocalEnvConfig(context: $TSContext) {
   let { awsConfigInfo } = context.exeInfo;
-  const { appId } = _.get(context, ['exeInfo', 'inputParams', 'amplify'], {});
+  const { appId } = _.get(context, ['exeInfo', 'inputParams', 'amplify'], {}) as any;
   if (appId && doAdminTokensExist(appId)) {
     awsConfigInfo = {
       configLevel: 'amplifyAdmin',
@@ -621,7 +630,7 @@ export async function loadConfigurationForEnv(context: $TSContext, env: string, 
       awsConfigInfo.region = resolveRegion();
     }
 
-    return awsConfigInfo.config;
+    return awsConfigInfo.config as AwsSdkConfig;
   }
 
   const projectConfigInfo = getConfigForEnv(context, env);
@@ -697,7 +706,7 @@ async function newUserCheck(context: $TSContext) {
   const configSource = scanConfig(context);
   if (!configSource) {
     if (context.exeInfo.inputParams[constants.ProviderName]) {
-      const inputParams = context.exeInfo.inputParams[constants.ProviderName];
+      const inputParams: CoreAwsConfig = (context.exeInfo.inputParams[constants.ProviderName] as unknown) as any;
       const inputConfigSufficient =
         inputParams.configLevel === 'general' || (inputParams.configLevel === 'project' && !inputParams.config.useProfile);
       if (inputConfigSufficient) {

@@ -23,7 +23,7 @@ export type $TSContext = {
   migrationInfo: MigrationInfo;
   projectHasMobileHubResources: boolean;
   prompt: $TSAny;
-  exeInfo: $TSAny;
+  exeInfo: Partial<ExeInfo>;
   input: $CommandLineInput;
   parameters: ContextParameters;
   usageData: IUsageData;
@@ -34,6 +34,58 @@ export type $TSContext = {
   template: IContextTemplate;
   updatingAuth: any; // this seems to actually implement CognitoStackOptions
 };
+
+export type ExeInfoInputParams = CommandLineOptions & Record<string, ProjectSettings>;
+export type AwsConfigLevel = 'general' | 'project' | 'amplifyAdmin';
+export type AwsProjectConfig = {
+  profileName: string;
+  useProfile: boolean;
+  region: string;
+  sessionToken: string;
+  secretAccessKey: string;
+  accessKeyId: string;
+};
+export type AwsConfig = {
+  region?: string;
+  configLevel: AwsConfigLevel;
+  action?: 'cancel' | 'update' | 'create' | 'none' | 'remove' | 'init';
+  configValidated?: boolean;
+  config?: Partial<AwsProjectConfig>;
+};
+export interface ExeInfo {
+  inputParams: ExeInfoInputParams;
+  amplifyMeta: $TSMeta;
+  sourceEnvName: string;
+  iterativeRollback: boolean;
+  teamProviderInfo: TeamProviderInfo;
+  isNewEnv: boolean;
+  cftInvalidationData: Record<string, unknown>;
+  awsConfigInfo: AwsConfig;
+  parameters: {
+    bucketName: string;
+  };
+  template: {
+    Resources: Record<string, unknown>;
+    Outputs: Record<string, unknown>;
+  };
+  serviceMeta: {
+    output: {
+      CloudFrontSercureURL: string;
+      WebsiteURL: string;
+      Id: string;
+    };
+  };
+  pinpointInputParams: Record<string, unknown>;
+  pinpointClient: Record<string, unknown>;
+  backendConfig: Record<string, unknown>;
+  localEnvInfo: LocalEnvInfo;
+  existingLocalEnvInfo: LocalEnvInfo;
+  forcePush: boolean;
+  restoreBackend: boolean;
+  projectConfig: ProjectConfig;
+  existingProjectConfig?: ProjectConfig;
+  isNewProject: boolean;
+}
 
 export interface MigrationInfo {
   amplifyMeta: $TSMeta;
@@ -59,10 +111,10 @@ export type LocalAwsInfo = {
 
 export type ProjectConfig<T extends string = ''> = Pick<
   ProjectSettings,
-  'frontend' | 'version' | 'providers' | 'projectPath' | 'defaultEditor' | 'frontendHandler'
+  'frontend' | 'version' | 'providers' | 'projectPath' | 'defaultEditor' | 'frontendHandler' | 'projectName'
 > &
   Record<T, string>;
-export type LocalEnvInfo = Pick<ProjectSettings, 'projectPath' | 'defaultEditor' | 'envName'>;
+export type LocalEnvInfo = Pick<ProjectSettings, 'noUpdateBackend' | 'projectPath' | 'defaultEditor' | 'envName'>;
 export interface FlowRecorder {
   setIsHeadless: (headless: boolean) => void;
   pushHeadlessFlow: (headlessFlowDataString: string, input: $CommandLineInput) => void;
@@ -72,6 +124,9 @@ export interface FlowRecorder {
 }
 export interface IUsageData extends IUsageMetricsData, FlowRecorder {}
 export type ProjectSettings = {
+  noUpdateBackend?: boolean;
+  projectName?: string;
+  configLevel?: string;
   frontend?: string;
   editor?: string;
   envName?: string;
@@ -185,32 +240,51 @@ export interface ContextParameters extends Pick<$CommandLineInput, 'argv' | 'plu
   third?: string;
 }
 
+export type CategoriesOptions = {
+  storage: Record<string, unknown>;
+};
+export type CommandLineOptions = {
+  categories?: CategoriesOptions;
+  restore?: boolean;
+  json?: boolean;
+  name?: string;
+  awsInfo?: string;
+  config?: Record<string, unknown>;
+  'iterative-rollback'?: boolean;
+  force?: boolean;
+  env?: string;
+  rootStackName?: string;
+  frontend?: string;
+  quickstart?: boolean;
+  app?: string | boolean;
+  timeout?: string;
+  event?: string;
+  minify?: boolean;
+  help?: boolean;
+  localEnvFilePath?: string;
+  yes?: boolean;
+  appId?: string;
+  amplify?: AmplifyInputOptions;
+  awscloudformation?: AwsConfig;
+} & Record<string, string | boolean>;
+
+export type AmplifyInputOptions = {
+  frontend?: string;
+  envName?: string;
+  appId?: string;
+  projectName?: string;
+  defaultEditor?: string;
+  editor?: string;
+  noOverride?: string;
+  headless?: boolean;
+};
+
 export type $CommandLineInput = {
   argv: Array<string>;
   plugin?: string;
   command: string;
   subCommands?: string[];
-  options?: {
-    restore?: boolean;
-    json?: boolean;
-    name?: string;
-    awsInfo?: string;
-    config?: string;
-    'iterative-rollback'?: boolean;
-    force?: boolean;
-    env?: string;
-    rootStackName?: string;
-    frontend?: string;
-    quickstart?: boolean;
-    app?: string | boolean;
-    timeout?: string;
-    event?: string;
-    minify?: boolean;
-    help?: boolean;
-    localEnvFilePath?: string;
-    yes?: boolean;
-    appId?: string;
-  } & Record<string, string | boolean>;
+  options?: CommandLineOptions;
 };
 
 export type Plugin = {
