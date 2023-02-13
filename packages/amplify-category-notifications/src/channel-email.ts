@@ -15,7 +15,7 @@ const deploymentType = ChannelConfigDeploymentType.INLINE;
  * @param context amplify cli context
  */
 export const configure = async (context: $TSContext): Promise<void> => {
-  const isChannelEnabled = context.exeInfo.serviceMeta.output[channelName]?.Enabled;
+  const isChannelEnabled = context.exeInfo.serviceMeta?.output[channelName]?.Enabled;
 
   if (isChannelEnabled) {
     printer.info(`The ${channelName} channel is currently enabled`);
@@ -45,8 +45,8 @@ export const enable = async (context: $TSContext, successMessage: string | undef
     answers = validateInputParams(context.exeInfo.pinpointInputParams[channelName]);
   } else {
     let channelOutput: $TSAny = {};
-    if (context.exeInfo.serviceMeta.output[channelName]) {
-      channelOutput = context.exeInfo.serviceMeta.output[channelName];
+    if (context.exeInfo.serviceMeta!.output[channelName]) {
+      channelOutput = context.exeInfo.serviceMeta!.output[channelName];
     }
     answers = {
       FromAddress: await prompter.input(`The 'From' Email address used to send emails`, { initial: channelOutput.FromAddress }),
@@ -58,7 +58,7 @@ export const enable = async (context: $TSContext, successMessage: string | undef
   }
 
   const params = {
-    ApplicationId: context.exeInfo.serviceMeta.output.Id,
+    ApplicationId: context.exeInfo.serviceMeta!.output.Id,
     EmailChannelRequest: {
       ...answers,
       Enabled: true,
@@ -67,9 +67,9 @@ export const enable = async (context: $TSContext, successMessage: string | undef
 
   spinner.start('Enabling Email Channel.');
   try {
-    const data = await context.exeInfo.pinpointClient.updateEmailChannel(params).promise();
+    const data = await context.exeInfo.pinpointClient!.updateEmailChannel(params).promise();
     spinner.succeed(successMessage ?? `The ${channelName} channel has been successfully enabled.`);
-    context.exeInfo.serviceMeta.output[channelName] = {
+    context.exeInfo.serviceMeta!.output[channelName] = {
       RoleArn: params.EmailChannelRequest.RoleArn,
       ...data.EmailChannelResponse,
     };
@@ -110,9 +110,9 @@ const validateInputParams = (channelInput: $TSAny): $TSAny => {
  * @returns Pinpoint API response
  */
 export const disable = async (context: $TSContext): Promise<$TSAny> => {
-  const channelOutput = validateInputParams(context.exeInfo.serviceMeta.output[channelName]);
+  const channelOutput = validateInputParams(context.exeInfo.serviceMeta!.output[channelName]);
   const params = {
-    ApplicationId: context.exeInfo.serviceMeta.output.Id,
+    ApplicationId: context.exeInfo.serviceMeta!.output.Id,
     EmailChannelRequest: {
       Enabled: false,
       FromAddress: channelOutput.FromAddress,
@@ -122,9 +122,9 @@ export const disable = async (context: $TSContext): Promise<$TSAny> => {
   };
   spinner.start('Disabling Email Channel.');
   try {
-    const data = await context.exeInfo.pinpointClient.updateEmailChannel(params).promise();
+    const data = await context.exeInfo.pinpointClient!.updateEmailChannel(params).promise();
     spinner.succeed(`The ${channelName} channel has been disabled.`);
-    context.exeInfo.serviceMeta.output[channelName] = data.EmailChannelResponse;
+    context.exeInfo.serviceMeta!.output[channelName] = data.EmailChannelResponse;
     return buildPinpointChannelResponseSuccess(ChannelAction.DISABLE, deploymentType, channelName, data.EmailChannelResponse);
   } catch (err) {
     if (err && err.code === 'NotFoundException') {
@@ -159,7 +159,7 @@ export const pull = async (context: $TSContext, pinpointApp: $TSAny): Promise<$T
 
   spinner.start(`Retrieving channel information for ${channelName}.`);
   try {
-    const data = await context.exeInfo.pinpointClient.getEmailChannel(params).promise();
+    const data = await context.exeInfo.pinpointClient!.getEmailChannel(params).promise();
     spinner.succeed(`Channel information retrieved for ${channelName}`);
     // eslint-disable-next-line no-param-reassign
     pinpointApp[channelName] = data.EmailChannelResponse;

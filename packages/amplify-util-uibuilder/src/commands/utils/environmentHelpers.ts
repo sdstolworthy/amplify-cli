@@ -6,7 +6,7 @@ import { extractArgs } from './extractArgs';
  */
 export const getEnvName = (context: $TSContext, envName?: string): string => {
   const args = extractArgs(context);
-  return envName || args?.environmentName || context.exeInfo.localEnvInfo.envName;
+  return (envName || args?.environmentName || context.exeInfo.localEnvInfo?.envName) as string;
 };
 
 /**

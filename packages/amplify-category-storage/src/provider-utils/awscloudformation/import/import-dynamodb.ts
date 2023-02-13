@@ -283,7 +283,7 @@ export const importedDynamoDBEnvInit = async (
   providerUtils: ProviderUtils,
   currentEnvSpecificParameters: DynamoDBEnvSpecificResourceParameters,
   isInHeadlessMode: boolean,
-  headlessParams: ImportDynamoDBHeadlessParameters,
+  headlessParams: Partial<ImportDynamoDBHeadlessParameters>,
 ): Promise<{ doServiceWalkthrough?: boolean; succeeded?: boolean; envSpecificParameters?: DynamoDBEnvSpecificResourceParameters }> => {
   const dynamoDB = await providerUtils.createDynamoDBService(context);
   const amplifyMeta = stateManager.getMeta();
@@ -419,7 +419,7 @@ const headlessImport = async (
   dynamoDB: IDynamoDBService,
   providerName: string,
   resourceParameters: DynamoDBResourceParameters,
-  headlessParams: ImportDynamoDBHeadlessParameters,
+  headlessParams: Partial<ImportDynamoDBHeadlessParameters>,
 ): Promise<{ succeeded: boolean; envSpecificParameters: DynamoDBEnvSpecificResourceParameters }> => {
   // Validate required parameters' presence and merge into parameters
   const currentEnvSpecificParameters = ensureHeadlessParameters(resourceParameters, headlessParams);
@@ -457,7 +457,7 @@ const headlessImport = async (
 
 const ensureHeadlessParameters = (
   resourceParameters: DynamoDBResourceParameters,
-  headlessParams: ImportDynamoDBHeadlessParameters,
+  headlessParams: Partial<ImportDynamoDBHeadlessParameters>,
 ): DynamoDBEnvSpecificResourceParameters => {
   // If we are doing headless mode, validate parameter presence and overwrite the input values from env specific params since they can be
   // different for the current env operation (eg region can mismatch)
@@ -477,17 +477,16 @@ const ensureHeadlessParameters = (
     throw new Error(`storage headless is missing the following inputParams ${missingParams.join(', ')}`);
   }
 
-  const tableParams = Object.keys(headlessParams.tables).filter(t => t === resourceParameters.resourceName);
+  const tableParams = Object.keys(headlessParams?.tables ?? {}).filter(t => t === resourceParameters.resourceName);
 
   if (tableParams?.length !== 1) {
     throw new Error(
       `storage headless expected 1 element for resource: ${resourceParameters.resourceName}, but found: ${tableParams.length}`,
     );
   }
-
   const envSpecificParameters: DynamoDBEnvSpecificResourceParameters = {
-    tableName: headlessParams.tables[tableParams[0]],
-    region: headlessParams.region,
+    tableName: headlessParams.tables![tableParams[0]],
+    region: headlessParams.region!,
   };
 
   return envSpecificParameters;

@@ -30,6 +30,7 @@
     "ajv": "^6.12.6",
     "amplify-cli-logger": "1.2.3",
     "amplify-prompts": "2.6.3",
+    "aws-sdk": "^2.1313.0",
     "chalk": "^4.1.1",
     "ci-info": "^2.0.0",
     "cli-table3": "^0.6.0",

@@ -299,7 +299,7 @@ export const importedS3EnvInit = async (
   providerUtils: ProviderUtils,
   currentEnvSpecificParameters: S3EnvSpecificResourceParameters,
   isInHeadlessMode: boolean,
-  headlessParams: ImportS3HeadlessParameters,
+  headlessParams: Partial<ImportS3HeadlessParameters>,
 ): Promise<{ doServiceWalkthrough?: boolean; succeeded?: boolean; envSpecificParameters?: S3EnvSpecificResourceParameters }> => {
   const s3 = await providerUtils.createS3Service(context);
   const isPulling = context.input.command === 'pull' || (context.input.command === 'env' && context.input.subCommands?.[0] === 'pull');
@@ -411,7 +411,7 @@ const headlessImport = async (
   s3: IS3Service,
   providerName: string,
   resourceParameters: S3ResourceParameters,
-  headlessParams: ImportS3HeadlessParameters,
+  headlessParams: Partial<ImportS3HeadlessParameters>,
 ): Promise<{ succeeded: boolean; envSpecificParameters: S3EnvSpecificResourceParameters }> => {
   // Validate required parameters' presence and merge into parameters
   const currentEnvSpecificParameters = ensureHeadlessParameters(headlessParams);
@@ -444,7 +444,7 @@ const headlessImport = async (
   };
 };
 
-const ensureHeadlessParameters = (headlessParams: ImportS3HeadlessParameters): S3EnvSpecificResourceParameters => {
+const ensureHeadlessParameters = (headlessParams: Partial<ImportS3HeadlessParameters>): S3EnvSpecificResourceParameters => {
   // If we are doing headless mode, validate parameter presence and overwrite the input values from env specific params since they can be
   // different for the current env operation (eg region can mismatch)
 
@@ -464,8 +464,8 @@ const ensureHeadlessParameters = (headlessParams: ImportS3HeadlessParameters): S
   }
 
   const envSpecificParameters: S3EnvSpecificResourceParameters = {
-    bucketName: headlessParams.bucketName,
-    region: headlessParams.region,
+    bucketName: headlessParams.bucketName!,
+    region: headlessParams.region!,
   };
 
   return envSpecificParameters;

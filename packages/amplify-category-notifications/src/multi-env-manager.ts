@@ -55,8 +55,8 @@ export const initEnv = async (context: $TSContext): Promise<$TSAny> => {
       // looks like channels are enabled but also deployed hence no need to deploy again.
       // Only update notifications (amplifyMeta and backendConfig) with current pinpoint meta
       if (pinpointNotificationsMeta.output?.Id) {
-        const { envName } = context.exeInfo.localEnvInfo;
-        const regulatedResourceName = PinpointName.extractResourceName(pinpointNotificationsMeta.Name, envName);
+        const { envName } = context.exeInfo.localEnvInfo!;
+        const regulatedResourceName = PinpointName.extractResourceName(pinpointNotificationsMeta.Name, envName!);
         // update amplifyMeta.notifications from current pinpoint meta
         context.exeInfo.amplifyMeta.notifications = {
           [regulatedResourceName]: {
@@ -72,8 +72,8 @@ export const initEnv = async (context: $TSContext): Promise<$TSAny> => {
         // update backendConfig with current pinpoint meta
         const availableChannels = getAvailableChannels();
         const enabledChannels = availableChannels.filter(channelName => channelName in pinpointNotificationsMeta.output);
-        context.exeInfo.backendConfig.notifications = context.exeInfo.backendConfig.notifications || {};
-        context.exeInfo.backendConfig.notifications = {
+        context.exeInfo.backendConfig!.notifications = context.exeInfo.backendConfig!.notifications || {};
+        context.exeInfo.backendConfig!.notifications = {
           [regulatedResourceName]: {
             service: pinpointNotificationsMeta.service,
             channels: enabledChannels,
@@ -174,10 +174,10 @@ const constructPinpointNotificationsMeta = async (context: $TSContext): Promise<
 
   const { teamProviderInfo, localEnvInfo, amplifyMeta, backendConfig } = context.exeInfo;
 
-  const { envName } = localEnvInfo;
+  const { envName } = localEnvInfo!;
 
-  if (teamProviderInfo?.[envName]?.categories?.[AmplifyCategories.NOTIFICATIONS]?.[AmplifySupportedService.PINPOINT]?.Id) {
-    pinpointApp = teamProviderInfo[envName].categories[AmplifyCategories.NOTIFICATIONS][AmplifySupportedService.PINPOINT];
+  if (teamProviderInfo?.[envName!]?.categories?.[AmplifyCategories.NOTIFICATIONS]?.[AmplifySupportedService.PINPOINT]?.Id) {
+    pinpointApp = teamProviderInfo[envName!].categories[AmplifyCategories.NOTIFICATIONS][AmplifySupportedService.PINPOINT];
   }
 
   let isMobileHubMigrated = false;
@@ -206,8 +206,8 @@ const constructPinpointNotificationsMeta = async (context: $TSContext): Promise<
   // as all data is present in the service, no need for any updates.
 
   if (!isMobileHubMigrated) {
-    if (backendConfig[AmplifyCategories.NOTIFICATIONS]) {
-      const categoryConfig = backendConfig[AmplifyCategories.NOTIFICATIONS];
+    if (backendConfig![AmplifyCategories.NOTIFICATIONS]) {
+      const categoryConfig = backendConfig![AmplifyCategories.NOTIFICATIONS];
       const resources = Object.keys(categoryConfig);
       for (const resource of resources) {
         serviceBackendConfig = categoryConfig[resource];
@@ -234,7 +234,7 @@ const constructPinpointNotificationsMeta = async (context: $TSContext): Promise<
       if (pinpointNotificationsMeta) {
         pinpointNotificationsMeta.channels = serviceBackendConfig.channels;
       } else {
-        return generateMetaFromConfig(envName, serviceBackendConfig);
+        return generateMetaFromConfig(envName!, serviceBackendConfig);
       }
     }
     return pinpointNotificationsMeta;
@@ -382,10 +382,10 @@ const pushChanges = async (context: $TSContext, pinpointNotificationsMeta: $TSAn
     context,
     context.exeInfo.amplifyMeta,
     pinpointNotificationsMeta,
-    context.exeInfo.localEnvInfo.envName,
+    context.exeInfo.localEnvInfo?.envName,
   );
 
-  await ensurePinpointApp(context, pinpointNotificationsMeta, pinpointAppStatus, context.exeInfo.localEnvInfo.envName);
+  await ensurePinpointApp(context, pinpointNotificationsMeta, pinpointAppStatus, context.exeInfo.localEnvInfo?.envName);
   const results: Array<IChannelAPIResponse | undefined> = [];
 
   /**
@@ -490,7 +490,7 @@ const fillTeamProviderInfo = (context: $TSContext, migrationInfo: $TSAny): void 
 };
 
 const buildPinpointInputParametersFromAmplifyMeta = (context: $TSContext): Record<string, $TSAny> => {
-  const { envName } = context.exeInfo.localEnvInfo;
+  const { envName } = context.exeInfo.localEnvInfo!;
   const { amplifyMeta } = context.exeInfo;
   const pinpointInputParameters: Record<string, $TSAny> = { envName };
   const categoryMeta = amplifyMeta[AmplifyCategories.NOTIFICATIONS];
@@ -516,9 +516,9 @@ const buildPinpointInputParametersFromAmplifyMeta = (context: $TSContext): Recor
 
 const buildPinpointInputParametersFromBackendConfig = (context: $TSContext): Record<string, $TSAny> => {
   const { backendConfig } = context.exeInfo;
-  const { envName } = context.exeInfo.localEnvInfo;
+  const { envName } = context.exeInfo.localEnvInfo!;
   const pinpointInputParameters: Record<string, $TSAny> = { envName };
-  const categoryConfig = backendConfig[AmplifyCategories.NOTIFICATIONS];
+  const categoryConfig = backendConfig![AmplifyCategories.NOTIFICATIONS];
   const resourceNames = Object.keys(categoryConfig);
   const availableChannels = getAvailableChannels();
   for (const resourceName of resourceNames) {

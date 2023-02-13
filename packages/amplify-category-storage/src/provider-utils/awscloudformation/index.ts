@@ -171,7 +171,7 @@ const getHeadlessParams = (context: $TSContext) => {
     const { categories } = ((typeof inputParams === 'string'
       ? JSONUtilities.parse(inputParams)
       : inputParams ?? {}) as unknown) as ExeInfoInputParams;
-    return categories?.storage;
+    return categories?.storage ?? {};
   } catch (err) {
     throw new Error(`Failed to parse storage headless parameters: ${err}`);
   }

@@ -2,6 +2,7 @@
 import { ViewResourceTableParams } from './cliViewAPI';
 import { ServiceSelection } from './serviceSelection';
 import { Tag } from './tags';
+import { Pinpoint } from 'aws-sdk';
 
 // Temporary types until we can finish full type definition across the whole CLI
 
@@ -53,6 +54,7 @@ export type AwsConfig = {
   config?: Partial<AwsProjectConfig>;
 };
 export interface ExeInfo {
+  pinpointApp?: Record<string, any>;
   inputParams: ExeInfoInputParams;
   amplifyMeta: $TSMeta;
   sourceEnvName: string;
@@ -68,16 +70,10 @@ export interface ExeInfo {
     Resources: Record<string, unknown>;
     Outputs: Record<string, unknown>;
   };
-  serviceMeta: {
-    output: {
-      CloudFrontSercureURL: string;
-      WebsiteURL: string;
-      Id: string;
-    };
-  };
+  serviceMeta: Record<string, any>;
   pinpointInputParams: Record<string, unknown>;
-  pinpointClient: Record<string, unknown>;
-  backendConfig: Record<string, unknown>;
+  pinpointClient: Pinpoint;
+  backendConfig: Record<string, any>;
   localEnvInfo: LocalEnvInfo;
   existingLocalEnvInfo: LocalEnvInfo;
   forcePush: boolean;
@@ -103,7 +99,7 @@ export type TeamProviderEnvironment = {
   categories: Record<string, unknown>;
 };
 export type TeamProviderInfo = {
-  [envName: string]: Record<string, unknown>;
+  [envName: string]: Record<string, any>;
 };
 export type LocalAwsInfo = {
   NONE: Record<string, unknown>;
@@ -113,7 +109,7 @@ export type ProjectConfig<T extends string = ''> = Pick<
   ProjectSettings,
   'frontend' | 'version' | 'providers' | 'projectPath' | 'defaultEditor' | 'frontendHandler' | 'projectName'
 > &
-  Record<T, string>;
+  Record<T, any>;
 export type LocalEnvInfo = Pick<ProjectSettings, 'noUpdateBackend' | 'projectPath' | 'defaultEditor' | 'envName'>;
 export interface FlowRecorder {
   setIsHeadless: (headless: boolean) => void;
@@ -241,9 +237,17 @@ export interface ContextParameters extends Pick<$CommandLineInput, 'argv' | 'plu
 }
 
 export type CategoriesOptions = {
-  storage: Record<string, unknown>;
-};
+  storage: {
+    bucketName: string;
+    region: string;
+  };
+  function: Record<string, unknown>;
+  auth: Record<string, unknown>;
+} & Record<string, any>;
 export type CommandLineOptions = {
+  envName?: string;
+  newEnvName?: string;
+  sourceEnvName?: string;
   categories?: CategoriesOptions;
   restore?: boolean;
   json?: boolean;

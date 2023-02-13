@@ -310,7 +310,7 @@ export const ensurePinpointApp = async (
   let pinpointApp: Partial<ICategoryMeta> | undefined;
   let resourceName;
   const amplifyMeta = context.exeInfo.amplifyMeta || stateManager.getMeta();
-  const envName = appEnvName || context.exeInfo.localEnvInfo.envName || stateManager.getCurrentEnvName();
+  const envName = appEnvName || context.exeInfo.localEnvInfo?.envName || stateManager.getCurrentEnvName();
   const pinpointAppStatus = appStatus || (await getPinpointAppStatus(context, amplifyMeta, pinpointNotificationsMeta, envName));
   switch (pinpointAppStatus.status) {
     case IPinpointDeploymentStatus.NO_ENV: {
@@ -331,7 +331,7 @@ export const ensurePinpointApp = async (
     case IPinpointDeploymentStatus.APP_IS_DEPLOYED: {
       if (pinpointNotificationsMeta?.output) {
         pinpointApp = pinpointNotificationsMeta?.output as ICategoryMeta;
-        pinpointApp.regulatedResourceName = PinpointName.extractResourceName(pinpointNotificationsMeta.Name, envName);
+        pinpointApp.regulatedResourceName = PinpointName.extractResourceName(pinpointNotificationsMeta.Name, envName!);
         resourceName = pinpointApp.regulatedResourceName; // Pinpoint name - envName;
         // Update pinpointApp into Notifications amplifyMeta (in-core)
         context.exeInfo.amplifyMeta = constructResourceMeta(amplifyMeta, resourceName, pinpointApp);
@@ -384,7 +384,7 @@ export const ensurePinpointApp = async (
 
   if (resourceName && context.exeInfo.amplifyMeta[AmplifyCategories.NOTIFICATIONS]) {
     context.exeInfo.serviceMeta = context.exeInfo.amplifyMeta[AmplifyCategories.NOTIFICATIONS][resourceName];
-    context.exeInfo.pinpointApp = context.exeInfo.serviceMeta.output;
+    context.exeInfo.pinpointApp = context.exeInfo.serviceMeta?.output;
   }
 
   pinpointAppStatus.context = context;
