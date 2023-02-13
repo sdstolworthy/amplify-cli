@@ -54,8 +54,8 @@ const getFrontendHandler = async (context: $TSContext, frontendPlugins: $TSAny, 
   let frontend;
   const frontendPluginList = Object.keys(frontendPlugins);
   const { inputParams } = context.exeInfo;
-  if (inputParams && inputParams.amplify.frontend) {
-    frontend = normalizeFrontendHandlerName(inputParams.amplify.frontend, frontendPluginList);
+  if (inputParams && inputParams.amplify!.frontend) {
+    frontend = normalizeFrontendHandlerName(inputParams.amplify!.frontend, frontendPluginList);
   }
 
   if (!frontend && inputParams && inputParams.yes) {

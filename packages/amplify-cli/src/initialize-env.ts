@@ -11,7 +11,7 @@ export const initializeEnv = async (
   context: $TSContext,
   currentAmplifyMeta: $TSMeta = stateManager.currentMetaFileExists() ? stateManager.getCurrentMeta() : undefined,
 ): Promise<void> => {
-  const currentEnv = context.exeInfo.localEnvInfo.envName;
+  const currentEnv = context.exeInfo.localEnvInfo.envName!;
   const isPulling = context.input.command === 'pull' || (context.input.command === 'env' && context.input.subCommands?.[0] === 'pull');
 
   try {
@@ -25,7 +25,7 @@ export const initializeEnv = async (
     const envParamManager = (await ensureEnvParamManager(currentEnv)).instance;
 
     if (!context.exeInfo.restoreBackend) {
-      mergeBackendConfigIntoAmplifyMeta(projectPath, amplifyMeta);
+      mergeBackendConfigIntoAmplifyMeta(projectPath!, amplifyMeta);
       mergeCategoryEnvParamsIntoAmplifyMeta(envParamManager, amplifyMeta, 'hosting', 'ElasticContainer');
       stateManager.setMeta(projectPath, amplifyMeta);
     }
@@ -65,7 +65,7 @@ export const initializeEnv = async (
     const initializationTasks: (() => Promise<$TSAny>)[] = [];
     const providerPushTasks: (() => Promise<$TSAny>)[] = [];
 
-    for (const provider of context.exeInfo?.projectConfig?.providers) {
+    for (const provider of context.exeInfo?.projectConfig.providers ?? []) {
       try {
         const providerModule = await import(providerPlugins[provider]);
         initializationTasks.push(() => providerModule.initEnv(context, amplifyMeta.providers[provider]));
@@ -134,7 +134,7 @@ export const initializeEnv = async (
     }
 
     if (context.exeInfo.forcePush) {
-      for (const provider of context.exeInfo.projectConfig.providers) {
+      for (const provider of context.exeInfo.projectConfig.providers ?? []) {
         const providerModule = await import(providerPlugins[provider]);
 
         const resourceDefinition = await context.amplify.getResourceStatus(undefined, undefined, provider);

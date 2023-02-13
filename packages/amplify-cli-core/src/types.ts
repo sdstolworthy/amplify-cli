@@ -24,7 +24,7 @@ export type $TSContext = {
   migrationInfo: MigrationInfo;
   projectHasMobileHubResources: boolean;
   prompt: $TSAny;
-  exeInfo: Partial<ExeInfo>;
+  exeInfo: ExeInfo;
   input: $CommandLineInput;
   parameters: ContextParameters;
   usageData: IUsageData;
@@ -54,33 +54,34 @@ export type AwsConfig = {
   config?: Partial<AwsProjectConfig>;
 };
 export interface ExeInfo {
+  metaData?: Record<string, any>;
   pinpointApp?: Record<string, any>;
   inputParams: ExeInfoInputParams;
-  amplifyMeta: $TSMeta;
-  sourceEnvName: string;
-  iterativeRollback: boolean;
+  amplifyMeta?: $TSMeta;
+  sourceEnvName?: string;
+  iterativeRollback?: boolean;
   teamProviderInfo: TeamProviderInfo;
-  isNewEnv: boolean;
-  cftInvalidationData: Record<string, unknown>;
-  awsConfigInfo: AwsConfig;
-  parameters: {
+  isNewEnv?: boolean;
+  cftInvalidationData?: Record<string, unknown>;
+  awsConfigInfo?: AwsConfig;
+  parameters?: {
     bucketName: string;
   };
-  template: {
+  template?: {
     Resources: Record<string, unknown>;
     Outputs: Record<string, unknown>;
   };
-  serviceMeta: Record<string, any>;
-  pinpointInputParams: Record<string, unknown>;
-  pinpointClient: Pinpoint;
-  backendConfig: Record<string, any>;
+  serviceMeta?: Record<string, any>;
+  pinpointInputParams?: Record<string, unknown>;
+  pinpointClient?: Pinpoint;
+  backendConfig?: Record<string, any>;
   localEnvInfo: LocalEnvInfo;
-  existingLocalEnvInfo: LocalEnvInfo;
-  forcePush: boolean;
-  restoreBackend: boolean;
+  existingLocalEnvInfo?: LocalEnvInfo;
+  forcePush?: boolean;
+  restoreBackend?: boolean;
   projectConfig: ProjectConfig;
   existingProjectConfig?: ProjectConfig;
-  isNewProject: boolean;
+  isNewProject?: boolean;
 }
 
 export interface MigrationInfo {
@@ -105,12 +106,8 @@ export type LocalAwsInfo = {
   NONE: Record<string, unknown>;
 };
 
-export type ProjectConfig<T extends string = ''> = Pick<
-  ProjectSettings,
-  'frontend' | 'version' | 'providers' | 'projectPath' | 'defaultEditor' | 'frontendHandler' | 'projectName'
-> &
-  Record<T, any>;
-export type LocalEnvInfo = Pick<ProjectSettings, 'noUpdateBackend' | 'projectPath' | 'defaultEditor' | 'envName'>;
+export type ProjectConfig<T extends string = ''> = LocalEnvInfo & Record<T, any>;
+export type LocalEnvInfo = Required<Pick<ProjectSettings, 'projectPath'>> & Partial<ProjectSettings>;
 export interface FlowRecorder {
   setIsHeadless: (headless: boolean) => void;
   pushHeadlessFlow: (headlessFlowDataString: string, input: $CommandLineInput) => void;
@@ -125,11 +122,11 @@ export type ProjectSettings = {
   configLevel?: string;
   frontend?: string;
   editor?: string;
-  envName?: string;
+  envName: string;
   framework?: string;
   version?: string;
   providers?: string[];
-  projectPath?: string;
+  projectPath: string;
   defaultEditor?: string;
   frontendHandler?: unknown;
 };

@@ -11,7 +11,7 @@ export const getUiBuilderComponentsPath = (context: $TSContext): string => {
   const args = extractArgs(context);
   const srcDir = args.srcDir
     ? args.srcDir
-    : (context.exeInfo.projectConfig as ProjectConfig<'javascript'> | undefined)?.javascript.config.SourceDir;
+    : ((context.exeInfo.projectConfig as unknown) as ProjectConfig<'javascript'>)?.javascript.config.SourceDir;
   const uiBuilderComponentsPath = path.resolve(path.join('.', srcDir, 'ui-components'));
 
   if (!fs.existsSync(uiBuilderComponentsPath)) {

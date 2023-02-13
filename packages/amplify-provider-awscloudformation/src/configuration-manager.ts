@@ -7,6 +7,7 @@ import {
   $TSAny,
   $TSContext,
   AmplifyError,
+  ExeInfo,
 } from 'amplify-cli-core';
 import fs from 'fs-extra';
 import chalk from 'chalk';
@@ -131,7 +132,7 @@ function doesAwsConfigExists(context: $TSContext) {
   if (stateManager.localAWSInfoExists()) {
     const envAwsInfo = stateManager.getLocalAWSInfo();
     if (envAwsInfo[envName]) {
-      context.exeInfo = context.exeInfo || {};
+      context.exeInfo = context.exeInfo || ({} as ExeInfo);
       context.exeInfo.awsConfigInfo = envAwsInfo[envName];
       context.exeInfo.awsConfigInfo.config = envAwsInfo[envName];
       configExists = true;

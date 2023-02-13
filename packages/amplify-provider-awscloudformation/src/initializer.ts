@@ -7,6 +7,7 @@ import {
   $TSObject,
   AmplifyError,
   AmplifyFault,
+  ExeInfo,
   JSONUtilities,
   PathConstants,
   pathManager,
@@ -54,7 +55,7 @@ type ParamType = {
 export const run = async (context: $TSContext): Promise<void> => {
   await configurationManager.init(context);
   if (!context.exeInfo || context.exeInfo.isNewEnv) {
-    context.exeInfo = context.exeInfo || {};
+    context.exeInfo = context.exeInfo || ({} as ExeInfo);
     const { projectName } = context.exeInfo.projectConfig;
     const initTemplateFilePath = path.join(__dirname, '..', 'resources', 'rootStackTemplate.json');
     /* eslint-disable-next-line spellcheck/spell-checker */
