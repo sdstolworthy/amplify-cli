@@ -180,7 +180,7 @@ jobs:
           command: |
             yarn ts-node .circleci/validate_cdk_version.ts
 
-  lint:
+  smoketest:
     <<: *linux-e2e-executor-large
     steps:
       - restore_cache:
