@@ -187,6 +187,14 @@ jobs:
           key: amplify-cli-repo-{{ .Branch }}-{{ .Revision }}
       - restore_cache:
           key: amplify-cli-yarn-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - run: yarn smoketest
+  lint:
+    <<: *linux-e2e-executor-large
+    steps:
+      - restore_cache:
+          key: amplify-cli-repo-{{ .Branch }}-{{ .Revision }}
+      - restore_cache:
+          key: amplify-cli-yarn-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run: yarn lint-check
       - run: yarn lint-check-package-json
       - run: yarn prettier-check
@@ -919,6 +927,14 @@ jobs:
 
 workflows:
   version: 3
+  smoketest:
+    jobs:
+      - smoketest:
+          filters:
+            branches:
+              only:
+                - /smoketest\/.*/
+
   build_test_deploy_v3:
     jobs:
       - build:

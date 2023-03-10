@@ -1,4 +1,4 @@
-import * as execa from 'execa';
+import execa from 'execa';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as os from 'os';
@@ -29,7 +29,7 @@ export type SmoketestArgs = {
 };
 
 async function getArgs(): Promise<SmoketestArgs> {
-  const args = await yargs(process.argv.slice(2))
+  const args = yargs(process.argv.slice(2))
     .option('destructive', {
       type: 'boolean',
       description: 'DANGEROUS: Deletes the project directory if it exists',
